@@ -1,4 +1,4 @@
-package http
+package request
 
 import (
 	"bytes"
@@ -25,7 +25,7 @@ const (
 	_ContentTypeUrl  = "application/x-www-form-urlencoded"
 )
 
-type Client struct {
+type HttpClient struct {
 	host    string
 	path    string
 	header  map[string]string
@@ -34,35 +34,31 @@ type Client struct {
 	ctx context.Context
 }
 
-type options func(*Client)
+type HttpOptions func(*HttpClient)
 
-func NewClient(ctx context.Context, host string, opts ...options) *Client {
-	c := newDefaultClient(ctx, host)
-	c.applyOpts(opts...)
-
-	return c
-}
-
-func newDefaultClient(ctx context.Context, host string) *Client {
-	return &Client{
+func NewHttpClient(ctx context.Context, host string, opts ...HttpOptions) *HttpClient {
+	c := &HttpClient{
 		host:    host,
 		header:  make(map[string]string),
 		timeout: 5 * time.Second,
 		ctx:     ctx,
 	}
+	c.applyOpts(opts...)
+
+	return c
 }
 
-func (c *Client) applyOpts(opts ...options) {
+func (c *HttpClient) applyOpts(opts ...HttpOptions) {
 	for _, opt := range opts {
 		opt(c)
 	}
 }
 
-func (c *Client) GetUrl() string {
+func (c *HttpClient) GetUrl() string {
 	return c.host + c.path
 }
 
-func (c *Client) Get(params map[string]string, returnObj interface{}, opts ...options) error {
+func (c *HttpClient) Get(params map[string]string, returnObj interface{}, opts ...HttpOptions) error {
 	// applt opts
 	c.applyOpts(opts...)
 
@@ -96,7 +92,7 @@ func (c *Client) Get(params map[string]string, returnObj interface{}, opts ...op
 	return nil
 }
 
-func (c *Client) Post(reqBody interface{}, returnObj interface{}, opts ...options) error {
+func (c *HttpClient) Post(reqBody interface{}, returnObj interface{}, opts ...HttpOptions) error {
 	// apply opts
 	c.applyOpts(opts...)
 
@@ -154,7 +150,7 @@ func (c *Client) Post(reqBody interface{}, returnObj interface{}, opts ...option
 
 }
 
-func (c *Client) PostJson(reqBody []byte, returnObj interface{}, opts ...options) error {
+func (c *HttpClient) PostJson(reqBody []byte, returnObj interface{}, opts ...HttpOptions) error {
 	opts = append(opts, SetHeader(map[string]string{_ContentType: _ContentTypeJson}))
 
 	if err := c.Post(reqBody, returnObj, opts...); err != nil {
@@ -165,7 +161,7 @@ func (c *Client) PostJson(reqBody []byte, returnObj interface{}, opts ...options
 	return nil
 }
 
-func (c *Client) PostForm(reqBody map[string]string, returnObj interface{}, opts ...options) error {
+func (c *HttpClient) PostForm(reqBody map[string]string, returnObj interface{}, opts ...HttpOptions) error {
 	opts = append(opts, SetHeader(map[string]string{_ContentType: _ContentTypeUrl}))
 
 	if err := c.Post(reqBody, returnObj, opts...); err != nil {
@@ -176,7 +172,7 @@ func (c *Client) PostForm(reqBody map[string]string, returnObj interface{}, opts
 	return nil
 }
 
-func (c *Client) request(method, url string, reqBody []byte) (respBody []byte, code int, err error) {
+func (c *HttpClient) request(method, url string, reqBody []byte) (respBody []byte, code int, err error) {
 	// recover panic
 	defer func() {
 		if e := recover(); e != nil {
@@ -236,22 +232,22 @@ func (c *Client) request(method, url string, reqBody []byte) (respBody []byte, c
 	return respBody, resp.StatusCode, nil
 }
 
-func SetPath(path string) options {
-	return func(c *Client) {
+func SetPath(path string) HttpOptions {
+	return func(c *HttpClient) {
 		c.path = path
 	}
 }
 
-func SetHeader(header map[string]string) options {
-	return func(c *Client) {
+func SetHeader(header map[string]string) HttpOptions {
+	return func(c *HttpClient) {
 		for key, val := range header {
 			c.header[key] = val
 		}
 	}
 }
 
-func SetTimeout(d time.Duration) options {
-	return func(c *Client) {
+func SetTimeout(d time.Duration) HttpOptions {
+	return func(c *HttpClient) {
 		c.timeout = d
 	}
 }

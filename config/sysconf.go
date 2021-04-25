@@ -49,7 +49,8 @@ type Jeager struct {
 }
 
 type Kafka struct {
-	Addrs []string `json:"addrs"`
+	Addrs   []string `json:"addrs"`
+	Version string   `json:"version"`
 }
 
 type DelayQueue struct {

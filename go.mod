@@ -19,6 +19,6 @@ require (
 	github.com/pierrec/lz4 v2.6.0+incompatible // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/shelton-hu/logger v0.0.2
-	github.com/shelton-hu/util v0.0.1
+	github.com/shelton-hu/util v0.0.2
 	github.com/sirupsen/logrus v1.8.1
 )

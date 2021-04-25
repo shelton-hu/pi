@@ -12,7 +12,7 @@ import (
 // LockResourceFunc is function which will be done after lock successfully by redis.
 type LockResourceFunc func(ctx context.Context, args ...interface{}) ([]interface{}, error)
 
-type lockOptions func(*LockOption)
+type LockOptions func(*LockOption)
 type LockOption struct {
 	autoExpire                  int
 	maxExpire                   time.Duration
@@ -29,7 +29,7 @@ func newLockOption() *LockOption {
 	}
 }
 
-func (l *LockOption) applyOpts(opts ...lockOptions) {
+func (l *LockOption) applyOpts(opts ...LockOptions) {
 	for _, opt := range opts {
 		opt(l)
 	}
@@ -44,7 +44,7 @@ func (l *LockOption) applyOpts(opts ...lockOptions) {
 // There are two out parameters:
 //		irfnOut    out parameters of lrfn
 //		err        error
-func (r *Redis) TryLock(key string, lrfn LockResourceFunc, lrfnIn []interface{}, opts ...lockOptions) (lrfnOut []interface{}, err error) {
+func (r *Redis) TryLock(key string, lrfn LockResourceFunc, lrfnIn []interface{}, opts ...LockOptions) (lrfnOut []interface{}, err error) {
 	l := newLockOption()
 	l.applyOpts(opts...)
 
@@ -80,7 +80,7 @@ func (r *Redis) TryLock(key string, lrfn LockResourceFunc, lrfnIn []interface{},
 	return nil, errors.New("try lock failed")
 }
 
-func SetLockAutoExpire(d time.Duration) lockOptions {
+func SetLockAutoExpire(d time.Duration) LockOptions {
 	return func(l *LockOption) {
 		t := int(d) / int(time.Second)
 		if t < 2 {
@@ -90,19 +90,19 @@ func SetLockAutoExpire(d time.Duration) lockOptions {
 	}
 }
 
-func SetMaxExpire(d time.Duration) lockOptions {
+func SetMaxExpire(d time.Duration) LockOptions {
 	return func(l *LockOption) {
 		l.maxExpire = d
 	}
 }
 
-func SetLockRetryTimes(times int) lockOptions {
+func SetLockRetryTimes(times int) LockOptions {
 	return func(l *LockOption) {
 		l.retryTimes = times
 	}
 }
 
-func SetLockFirstRetryIntervalDuration(d time.Duration) lockOptions {
+func SetLockFirstRetryIntervalDuration(d time.Duration) LockOptions {
 	return func(l *LockOption) {
 		l.firstrRetryIntervalDuration = d
 	}
