@@ -6,13 +6,13 @@ import (
 )
 
 type KafkaHook struct {
-	k         kBroker
+	k         *kBroker
 	topic     string
 	formatter logrus.Formatter
 }
 
 // Create a new KafkaHook.
-func NewKafkaHook(topic string, b kBroker) *KafkaHook {
+func NewKafkaHook(topic string, b *kBroker) *KafkaHook {
 	hook := &KafkaHook{
 		k:         b,
 		formatter: &logrus.JSONFormatter{},
