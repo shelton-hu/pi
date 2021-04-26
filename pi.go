@@ -12,7 +12,6 @@ import (
 	"github.com/shelton-hu/pi/micro"
 	"github.com/shelton-hu/pi/mysql"
 	"github.com/shelton-hu/pi/redis"
-	"github.com/shelton-hu/pi/request"
 )
 
 var global *Pi
@@ -86,8 +85,8 @@ func SetGlobal(ctx context.Context, etcdAddresses []string, namespace, appname s
 		kafka.ConnectKafka(ctx, global.SysConf().Kafka)
 		closes.fns = append(closes.fns, func() { kafka.CloseKafka(ctx) })
 
-		global.microRpcService = micro.NewMicroRpcService(ctx, global.SysConf().Registry, o.microRpcOpts...)
-		global.microWebService = micro.NewMicroWebService(ctx, global.SysConf().Registry, o.microWebOpts...)
+		global.microRpcService = micro.NewRpcService(ctx, global.SysConf().Registry, o.microRpcOpts...)
+		global.microWebService = micro.NewWebService(ctx, global.SysConf().Registry, o.microWebOpts...)
 	})
 
 	return closes
@@ -134,8 +133,4 @@ func (p *Pi) MicroRpcService(ctx context.Context) goMicro.Service {
 
 func (p *Pi) MicroWebService(ctx context.Context) web.Service {
 	return p.microWebService
-}
-
-func (p *Pi) NewHttpClient(ctx context.Context, host string, opts ...request.HttpOptions) *request.HttpClient {
-	return request.NewHttpClient(ctx, host, opts...)
 }

@@ -13,7 +13,7 @@ import (
 	"github.com/shelton-hu/pi/config"
 )
 
-func NewMicroWebService(ctx context.Context, registryConfig config.Registry, opts ...web.Option) web.Service {
+func NewWebService(ctx context.Context, registryConfig config.Registry, opts ...web.Option) web.Service {
 	opt := registry.Option(func(opts *registry.Options) {
 		opts.Addrs = strings.Split(registryConfig.Address, ",")
 	})

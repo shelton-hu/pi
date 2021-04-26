@@ -7,10 +7,6 @@ import (
 
 	"github.com/micro/cli/v2"
 	"github.com/micro/go-micro/v2"
-	"github.com/micro/go-micro/v2/client"
-	"github.com/micro/go-micro/v2/client/grpc"
-	"github.com/micro/go-micro/v2/client/selector"
-	clientRegistry "github.com/micro/go-micro/v2/client/selector/registry"
 	"github.com/micro/go-micro/v2/registry"
 	"github.com/micro/go-micro/v2/registry/etcd"
 	"github.com/micro/go-plugins/wrapper/monitoring/prometheus/v2"
@@ -20,7 +16,7 @@ import (
 	"github.com/shelton-hu/pi/config"
 )
 
-func NewMicroRpcService(ctx context.Context, registryConfig config.Registry, opts ...micro.Option) micro.Service {
+func NewRpcService(ctx context.Context, registryConfig config.Registry, opts ...micro.Option) micro.Service {
 	opt := registry.Option(func(opts *registry.Options) {
 		opts.Addrs = strings.Split(registryConfig.Address, ",")
 	})
@@ -59,27 +55,4 @@ func NewMicroRpcService(ctx context.Context, registryConfig config.Registry, opt
 	service := micro.NewService(opts...)
 
 	return service
-}
-
-func NewMicroRpcClient(ctx context.Context, registryConfig config.Registry, opts ...client.Option) client.Client {
-	opt := registry.Option(func(opts *registry.Options) {
-		opts.Addrs = strings.Split(registryConfig.Address, ",")
-	})
-	registryOpt := etcd.NewRegistry(opt)
-
-	defaultOpts := []client.Option{
-		client.Registry(registryOpt),
-		client.Selector(clientRegistry.NewSelector(selector.Registry(registryOpt))),
-		client.WrapCall(
-			recoverCallWrapper(), //必须放在第一个
-			wrapperTracing.NewCallWrapper(opentracing.GlobalTracer()),
-			tracerCallWrapper(),
-		),
-		client.Retries(0),
-	}
-
-	//合并选项
-	opts = append(defaultOpts, opts...)
-
-	return grpc.NewClient(opts...)
 }
