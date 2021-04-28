@@ -8,3 +8,5 @@ go.sum
 .local
 .vscode
 .prettierrc
+
+.env
