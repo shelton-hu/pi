@@ -1,9 +1,9 @@
 version: "3"
 
 services:
-  pi-etcdkeeper:
+  dev-etcdkeeper:
     image: evildecay/etcdkeeper:v0.7.6
-    container_name: pi-etcdkeeper
+    container_name: dev-etcdkeeper
     environment:
       HOST: "0.0.0.0"
       PORT: 8088
@@ -13,19 +13,19 @@ services:
       - "8088:8088"
     restart: always
 
-  pi-etcd:
+  dev-etcd:
     image: quay.io/coreos/etcd:v3.2.18
-    container_name: pi-etcd
-    command: etcd --data-dir /data --listen-client-urls http://0.0.0.0:2379 --advertise-client-urls http://pi-etcd:2379 --max-snapshots 5 --max-wals 5 --auto-compaction-retention=168
+    container_name: dev-etcd
+    command: etcd --data-dir /data --listen-client-urls http://0.0.0.0:2379 --advertise-client-urls http://dev-etcd:2379 --max-snapshots 5 --max-wals 5 --auto-compaction-retention=168
     volumes:
       - ${DATA_PATH}/etcd:/data
     ports:
       - "2379:2379"
     restart: always
 
-  pi-mysql:
+  dev-mysql:
     image: mysql:5.7
-    container_name: pi-mysql
+    container_name: dev-mysql
     command: --max_allowed_packet=1073741824
     environment:
       - MYSQL_ROOT_PASSWORD=root
@@ -35,29 +35,29 @@ services:
       - "3306:3306"
     restart: always
 
-  pi-micro-api:
+  dev-micro-api:
     image: micro/micro:v2.9.3
-    container_name: pi-micro-api
-    command: ["/micro", "--registry_address=pi-etcd:2379", "-registry=etcd", "api", "--handler=http"]
+    container_name: dev-micro-api
+    command: ["/micro", "--registry_address=dev-etcd:2379", "-registry=etcd", "api", "--handler=http"]
     ports:
       - "8080:8080"
     depends_on:
-      - pi-etcd
+      - dev-etcd
     restart: always
 
-  pi-micro-web:
+  dev-micro-web:
     image: micro/micro:v2.9.3
-    container_name: pi-micro-web
-    command: ["/micro", "--registry_address=pi-etcd:2379", "-registry=etcd", "web"]
+    container_name: dev-micro-web
+    command: ["/micro", "--registry_address=dev-etcd:2379", "-registry=etcd", "web"]
     ports:
       - "8082:8082"
     depends_on:
-      - pi-etcd
+      - dev-etcd
     restart: always
 
-  pi-redis:
+  dev-redis:
     image: redis:5.0.7
-    container_name: pi-redis
+    container_name: dev-redis
     command: redis-server
     environment: 
       - PORT=6379
@@ -68,9 +68,9 @@ services:
       - "6379:6379"
     restart: always
 
-  pi-jaeger:
+  dev-jaeger:
     image: jaegertracing/all-in-one:latest
-    container_name: pi-jaeger
+    container_name: dev-jaeger
     environment:
       COLLECTOR_ZIPKIN_HTTP_PORT: 9411
     ports:
@@ -83,44 +83,44 @@ services:
       - "9411:9411"
     restart: always
 
-  pi-zookeeper:
+  dev-zookeeper:
     image: zookeeper:latest
-    container_name: pi-zookeeper
+    container_name: dev-zookeeper
     ports:
       - "2181:2181"
     restart: always
 
-  pi-kafka:
+  dev-kafka:
     image: wurstmeister/kafka:latest
-    container_name: pi-kafka
+    container_name: dev-kafka
     environment:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://127.0.0.1:9092
-      KAFKA_ZOOKEEPER_CONNECT: pi-zookeeper:2181
+      KAFKA_ZOOKEEPER_CONNECT: dev-zookeeper:2181
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
     ports:
       - "9092:9092"
     volumes:
       - ${DATA_PATH}/kafka:/kafka
     depends_on:
-      - pi-zookeeper
+      - dev-zookeeper
     restart: always
 
-  pi-kafka-manager:
+  dev-kafka-manager:
     image: kafkamanager/kafka-manager:latest
-    container_name: pi-kafka-manager
+    container_name: dev-kafka-manager
     environment:
-      ZK_HOSTS: pi-zookeeper:2181
-      KAFKA_BROKERS: pi-kafka:9092
+      ZK_HOSTS: dev-zookeeper:2181
+      KAFKA_BROKERS: dev-kafka:9092
     ports:
       - "9000:9000"
     depends_on:
-      - pi-zookeeper
-      - pi-kafka
+      - dev-zookeeper
+      - dev-kafka
     restart: always
 
-  pi-rabbitmq:
+  dev-rabbitmq:
     image: rabbitmq:3.8.3-management
-    container_name: pi-rabbitmq
+    container_name: dev-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: test
       RABBITMQ_DEFAULT_PASS: 123456
@@ -131,14 +131,14 @@ services:
       - "15672:15672"
     restart: always
 
-  pi-delay-queue:
+  dev-delay-queue:
     image: bitleak/lmstfy:latest
-    container_name: pi-delay-queue
+    container_name: dev-delay-queue
     ports:
       - "7777:7777"
       - "7778:7778"
     links:
-      - pi-redis:redis
+      - dev-redis:redis
     depends_on:
-      - pi-redis
+      - dev-redis
     restart: always

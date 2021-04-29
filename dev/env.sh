@@ -15,15 +15,15 @@ DATA_PATH=""
 
 if [ ${OS} = ${DARWIN} ];then
     if [ $(whoami) = "root" ];then
-        DATA_PATH="/var/root/.pi-data"
+        DATA_PATH="/var/root/.dev-data"
     else
-        DATA_PATH="/Users/$(whoami)/.pi-data"
+        DATA_PATH="/Users/$(whoami)/.dev-data"
     fi
 else
     if [ $(whoami) = "root" ];then
-        DATA_PATH="/root/.pi-data"
+        DATA_PATH="/root/.dev-data"
     else
-        DATA_PATH="/home/$(whoami)/.pi-data"
+        DATA_PATH="/home/$(whoami)/.dev-data"
     fi
 fi
 

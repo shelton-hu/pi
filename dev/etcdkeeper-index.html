@@ -32,7 +32,7 @@
 	<h2><img src="../framework/logo.png" width="20" style="position:relative;top:3px;"></img><font color="00a0e9"> ETCD</font> Keeper <span id="ver" style="border: 1px solid #D4D4D4;border-radius: 5px;cursor:pointer;">v3</span></h2>
 	<div class="noborder">
 		<img id="userButton" src="../framework/easyui/themes/icons/user.png" width="20" style="position:relative;top:7px;cursor:pointer;"></img>
-		<input id="etcdAddr" class="easyui-textbox" data-options="prompt:'middleware-etcd:2379',onChange:changeHost,iconCls:'icon-server',iconAlign:'left'" style="width:360px;height:30px;"/>
+		<input id="etcdAddr" class="easyui-textbox" data-options="prompt:'dev-etcd:2379',onChange:changeHost,iconCls:'icon-server',iconAlign:'left'" style="width:360px;height:30px;"/>
 	</div>
 	<div style="margin:20px 0;"></div>
 	<div id="elayout" class="easyui-layout" style="width:100%;height:550px;">
@@ -151,7 +151,7 @@
 		var serverBase = '/v3';
 		var etcdBase = Cookies.get('etcd-endpoint');
 		if(typeof(etcdBase) === 'undefined') {
-			etcdBase = 'middleware-etcd:2379';
+			etcdBase = 'dev-etcd:2379';
 		}
 
         // version switch
