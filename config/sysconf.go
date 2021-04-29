@@ -7,6 +7,7 @@ type SystemConfig struct {
 	Jeager     Jeager            `json:"jeager"`
 	Kafka      Kafka             `json:"kafka"`
 	DelayQueue DelayQueue        `json:"delay_queue"`
+	Cron       Cron              `json:"cron"`
 	Domain     map[string]string `json:"domain"`
 }
 
@@ -58,4 +59,20 @@ type DelayQueue struct {
 	Port      int    `json:"port"`
 	Namespace string `json:"namespace"`
 	Token     string `json:"token"`
+}
+
+type Cron struct {
+	Spec []CronSpec `json:"spec"`
+}
+
+type CronSpec struct {
+	//任务名称，需和注册任务时的名称保持一致
+	Name string `json:"name"`
+	//任务排程，暂时不支持`@reboot`
+	//@wiki https://en.wikipedia.org/wiki/Cron
+	Schedule string `json:"schedule"`
+	//任务起停按钮，当为true，代表暂停任务，默认为false
+	Suspend bool `json:"suspend"`
+	//任务并发数，默认为1
+	Parallelism int `json:"parallelism"`
 }
