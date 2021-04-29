@@ -9,6 +9,7 @@ import (
 
 	"github.com/shelton-hu/pi/config"
 	"github.com/shelton-hu/pi/cron"
+	"github.com/shelton-hu/pi/daemon"
 	"github.com/shelton-hu/pi/kafka"
 	"github.com/shelton-hu/pi/micro"
 	"github.com/shelton-hu/pi/mysql"
@@ -26,6 +27,7 @@ type Pi struct {
 	microRpcService goMicro.Service
 	microWebService web.Service
 	cron            *cron.Cron
+	daemon          *daemon.Daemon
 }
 
 type options func(*Option)
@@ -91,6 +93,7 @@ func SetGlobal(ctx context.Context, etcdAddresses []string, namespace, appname s
 		global.microWebService = micro.NewWebService(ctx, global.SysConf().Registry, o.microWebOpts...)
 
 		global.cron = cron.NewCron(ctx, global.SysConf())
+		global.daemon = daemon.NewDaemon(ctx)
 	})
 
 	return closes
@@ -141,4 +144,8 @@ func (p *Pi) MicroWebService(ctx context.Context) web.Service {
 
 func (p *Pi) Cron() *cron.Cron {
 	return p.cron
+}
+
+func (p *Pi) Daemon() *daemon.Daemon {
+	return p.daemon
 }
