@@ -4,7 +4,7 @@ type SystemConfig struct {
 	Registry   Registry          `json:"registry"`
 	Mysql      map[string]Mysql  `json:"database"`
 	Redis      Redis             `json:"redis"`
-	Jeager     Jeager            `json:"jeager"`
+	Jaeger     Jaeger            `json:"jaeger"`
 	Kafka      Kafka             `json:"kafka"`
 	DelayQueue DelayQueue        `json:"delay_queue"`
 	Cron       Cron              `json:"cron"`
@@ -42,7 +42,7 @@ type Redis struct {
 	KeyPrefix   string `json:"key_prefix"`
 }
 
-type Jeager struct {
+type Jaeger struct {
 	Host string  `json:"host"`
 	Port int     `json:"port"`
 	Name string  `json:"name"`

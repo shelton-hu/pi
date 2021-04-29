@@ -10,6 +10,7 @@ import (
 	"github.com/shelton-hu/pi/config"
 	"github.com/shelton-hu/pi/cron"
 	"github.com/shelton-hu/pi/daemon"
+	"github.com/shelton-hu/pi/jaeger"
 	"github.com/shelton-hu/pi/kafka"
 	"github.com/shelton-hu/pi/micro"
 	"github.com/shelton-hu/pi/mysql"
@@ -79,6 +80,9 @@ func SetGlobal(ctx context.Context, etcdAddresses []string, namespace, appname s
 		}
 
 		config.InitConfig(ctx, etcdAddresses, global.namespace, global.appName)
+
+		jaeger.ConnectJaeger(ctx, global.SysConf().Jaeger)
+		closes.fns = append(closes.fns, func() { jaeger.CloseJaeger(ctx) })
 
 		mysql.ConnectMysql(ctx, global.SysConf().Mysql)
 		closes.fns = append(closes.fns, func() { mysql.CloseMysql(ctx) })
