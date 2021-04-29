@@ -66,13 +66,13 @@ type Cron struct {
 }
 
 type CronSpec struct {
-	//任务名称，需和注册任务时的名称保持一致
+	// 任务名称，需和注册任务时的名称保持一致
 	Name string `json:"name"`
-	//任务排程，暂时不支持`@reboot`
-	//@wiki https://en.wikipedia.org/wiki/Cron
+	// 任务排程，暂时不支持`@reboot`
+	// @wiki https://en.wikipedia.org/wiki/Cron
 	Schedule string `json:"schedule"`
-	//任务起停按钮，当为true，代表暂停任务，默认为false
+	// 任务起停按钮，当为true，代表暂停任务，默认为false
 	Suspend bool `json:"suspend"`
-	//任务并发数，默认为1
+	// 任务并发数，默认为1
 	Parallelism int `json:"parallelism"`
 }
