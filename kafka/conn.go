@@ -13,7 +13,6 @@ import (
 )
 
 var kafka *Kafka
-var once sync.Once
 
 type Kafka struct {
 	addrs []string
@@ -27,48 +26,44 @@ type Kafka struct {
 }
 
 func ConnectKafka(ctx context.Context, kafkaConfig config.Kafka) {
-	once.Do(func() {
-		// kafka.addrs
-		kafka.addrs = kafkaConfig.Addrs
-		// kafka.cfg
-		config := sarama.NewConfig()
-		config.Producer.RequiredAcks = sarama.WaitForAll
-		config.Producer.Partitioner = sarama.NewRandomPartitioner
-		config.Producer.Return.Successes = true
-		config.Producer.Return.Errors = true
-		var err error
-		config.Version, err = sarama.ParseKafkaVersion(kafkaConfig.Version)
-		if err != nil {
-			panic(err)
-		}
-		kafka.cfg = config
-		// kafka.c
-		c, err := sarama.NewClient(kafka.addrs, kafka.cfg)
-		if err != nil {
-			panic(err)
-		}
-		kafka.c = c
-		// kafka.p
-		p, err := sarama.NewAsyncProducerFromClient(c)
-		if err != nil {
-			panic(err)
-		}
-		kafka.p = p
-		// kafka.cs
-		kafka.mu.Lock()
-		defer kafka.mu.Unlock()
-		kafka.cs = make([]sarama.Client, 0)
-		// kafka.clcfg
-		kafka.clcfg = cluster.NewConfig()
-		kafka.clcfg.Consumer.Offsets.Initial = sarama.OffsetNewest
-		kafka.clcfg.Group.Return.Notifications = true
-		kafka.clcfg.Version = kafka.cfg.Version
-	})
+	// kafka.addrs
+	kafka.addrs = kafkaConfig.Addrs
+	// kafka.cfg
+	config := sarama.NewConfig()
+	config.Producer.RequiredAcks = sarama.WaitForAll
+	config.Producer.Partitioner = sarama.NewRandomPartitioner
+	config.Producer.Return.Successes = true
+	config.Producer.Return.Errors = true
+	var err error
+	config.Version, err = sarama.ParseKafkaVersion(kafkaConfig.Version)
+	if err != nil {
+		panic(err)
+	}
+	kafka.cfg = config
+	// kafka.c
+	c, err := sarama.NewClient(kafka.addrs, kafka.cfg)
+	if err != nil {
+		panic(err)
+	}
+	kafka.c = c
+	// kafka.p
+	p, err := sarama.NewAsyncProducerFromClient(c)
+	if err != nil {
+		panic(err)
+	}
+	kafka.p = p
+	// kafka.cs
+	kafka.mu.Lock()
+	defer kafka.mu.Unlock()
+	kafka.cs = make([]sarama.Client, 0)
+	// kafka.clcfg
+	kafka.clcfg = cluster.NewConfig()
+	kafka.clcfg.Consumer.Offsets.Initial = sarama.OffsetNewest
+	kafka.clcfg.Group.Return.Notifications = true
+	kafka.clcfg.Version = kafka.cfg.Version
 }
 
 func CloseKafka(ctx context.Context) {
-	kafka.mu.Lock()
-	defer kafka.mu.Unlock()
 	for _, client := range kafka.cs {
 		if err := client.Close(); err != nil {
 			logger.Error(ctx, err.Error())

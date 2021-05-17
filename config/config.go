@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"os"
-	"sync"
 
 	microConfig "github.com/micro/go-micro/v2/config"
 	"github.com/micro/go-micro/v2/config/source/etcd"
@@ -24,13 +23,9 @@ var (
 	cusconf *CustomConfig
 )
 
-var syncOnce sync.Once
-
 func InitConfig(ctx context.Context, etcdAddresses []string, namespace string, appName string) {
-	syncOnce.Do(func() {
-		initConfig(ctx, etcdAddresses, namespace, appName, sysconf, _SysConfPath)
-		initConfig(ctx, etcdAddresses, namespace, appName, cusconf, _CusConfPath)
-	})
+	initConfig(ctx, etcdAddresses, namespace, appName, sysconf, _SysConfPath)
+	initConfig(ctx, etcdAddresses, namespace, appName, cusconf, _CusConfPath)
 }
 
 func SysConf() *SystemConfig {

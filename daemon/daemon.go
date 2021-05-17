@@ -108,7 +108,6 @@ func (d *Daemon) run() {
 			var count int
 
 			for {
-
 				// 执行注册的函数，并且记录执行时间
 				begin := time.Now()
 				goroutine.Go(daemonFunc.fn, daemonFunc.args...)
