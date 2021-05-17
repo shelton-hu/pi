@@ -90,7 +90,7 @@ func (d *Daemon) Run() {
 }
 
 // 执行协程守护，不会阻塞
-func (d *Daemon) RunWithNoBlock() {
+func (d *Daemon) RunWithoutBlock() {
 	d.run()
 }
 
