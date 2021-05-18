@@ -21,5 +21,4 @@ require (
 	github.com/shelton-hu/util v0.0.2
 	github.com/uber/jaeger-client-go v2.28.0+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
-
 )
