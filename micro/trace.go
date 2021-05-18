@@ -17,6 +17,7 @@ import (
 	"github.com/shelton-hu/util/protoutil"
 )
 
+// recoverHandlerWrapper ...
 func recoverHandlerWrapper() server.HandlerWrapper {
 	return func(hf server.HandlerFunc) server.HandlerFunc {
 		return func(ctx context.Context, req server.Request, resp interface{}) error {
@@ -32,6 +33,7 @@ func recoverHandlerWrapper() server.HandlerWrapper {
 	}
 }
 
+// traceHandlerWrapper ...
 func traceHandlerWrapper() server.HandlerWrapper {
 	return func(hf server.HandlerFunc) server.HandlerFunc {
 		return func(ctx context.Context, req server.Request, resp interface{}) error {
@@ -54,6 +56,7 @@ func traceHandlerWrapper() server.HandlerWrapper {
 	}
 }
 
+// afterWrapper ...
 func afterWrapper(span opentracing.Span, ctx context.Context, name string, request []byte, resp interface{}, spend float64, err error) {
 	response, _ := protoutil.ParseProtoToString(resp.(proto.Message))
 	errStr := ""

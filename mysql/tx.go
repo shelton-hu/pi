@@ -6,8 +6,10 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// TransFunc ...
 type TransFunc func(tx *gorm.DB) error
 
+// MysqlTransaction ...
 func (m *Mysql) MysqlTransaction(closures ...TransFunc) (err error) {
 	tx := m.Begin()
 	defer func() {

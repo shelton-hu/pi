@@ -16,6 +16,7 @@ import (
 	"github.com/shelton-hu/pi/config"
 )
 
+// NewRpcService ...
 func NewRpcService(ctx context.Context, registryConfig config.Registry, opts ...micro.Option) micro.Service {
 	opt := registry.Option(func(opts *registry.Options) {
 		opts.Addrs = strings.Split(registryConfig.Address, ",")
@@ -23,12 +24,12 @@ func NewRpcService(ctx context.Context, registryConfig config.Registry, opts ...
 	registryOpt := etcd.NewRegistry(opt)
 
 	defaultOpts := []micro.Option{
-		micro.Name(registryConfig.Name),                                              // 微服务名称
-		micro.Version(registryConfig.Version),                                        // 微服务版本
-		micro.Registry(registryOpt),                                                  // 注册微服务
-		micro.RegisterTTL(time.Second * time.Duration(registryConfig.Ttl)),           // 微服务发现组件中的节点存活时间
-		micro.RegisterInterval(time.Second * time.Duration(registryConfig.Interval)), // 微服务发现组件中的节点刷新间隔
-		micro.Metadata(registryConfig.MetaData),                                      // 微服务自身元数据，会上报给服务发现组件。是一个 key-value 列表
+		micro.Name(registryConfig.Name),
+		micro.Version(registryConfig.Version),
+		micro.Registry(registryOpt),
+		micro.RegisterTTL(time.Second * time.Duration(registryConfig.Ttl)),
+		micro.RegisterInterval(time.Second * time.Duration(registryConfig.Interval)),
+		micro.Metadata(registryConfig.MetaData),
 		micro.Flags(&cli.StringFlag{
 			Name:  "env",
 			Value: "dev",
@@ -43,7 +44,7 @@ func NewRpcService(ctx context.Context, registryConfig config.Registry, opts ...
 			Usage: "etcd address. the default valu is for env",
 		}),
 		micro.WrapHandler(
-			recoverHandlerWrapper(), //必须放在第一个
+			recoverHandlerWrapper(),
 			wrapperTracing.NewHandlerWrapper(opentracing.GlobalTracer()),
 			traceHandlerWrapper(),
 			prometheus.NewHandlerWrapper(),

@@ -11,9 +11,7 @@ import (
 
 type Handler func(channel string, message []byte) error
 
-/**
- * 发布
- */
+// Publish ...
 func (r *Redis) Publish(channel string, message string) (int, error) {
 	n, err := redis.Int(r.do("PUBLISH", channel, message))
 	if err != nil {
@@ -22,9 +20,7 @@ func (r *Redis) Publish(channel string, message string) (int, error) {
 	return n, nil
 }
 
-/**
- * 订阅
- */
+// Subscribe ...
 func (r *Redis) Subscribe(channels []string, handlers map[string]Handler) error {
 	defer r.conn.Close()
 

@@ -13,6 +13,12 @@ import (
 	"github.com/shelton-hu/pi/config"
 )
 
+// rdsPool is the redis pool for client connecting.
+var rdsPool *redis.Pool
+
+// rdsKeyPrefix is the prefix key of redis key-value.
+var rdsKeyPrefix string
+
 // Redis is a instance for calling most of the package's methods.
 type Redis struct {
 	// conn is the connection between the server and the client.
@@ -24,9 +30,6 @@ type Redis struct {
 	// ctx is used for logger and jeager record.
 	ctx context.Context
 }
-
-var rdsPool *redis.Pool
-var rdsKeyPrefix string
 
 // ConnectRedis connects to redis.
 func ConnectRedis(ctx context.Context, redisConfig config.Redis) {

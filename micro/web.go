@@ -13,6 +13,7 @@ import (
 	"github.com/shelton-hu/pi/config"
 )
 
+// NewWebService ...
 func NewWebService(ctx context.Context, registryConfig config.Registry, opts ...web.Option) web.Service {
 	opt := registry.Option(func(opts *registry.Options) {
 		opts.Addrs = strings.Split(registryConfig.Address, ",")
@@ -20,12 +21,12 @@ func NewWebService(ctx context.Context, registryConfig config.Registry, opts ...
 	registryOpt := etcd.NewRegistry(opt)
 
 	defaultOpts := []web.Option{
-		web.Name(registryConfig.Name),                                              // 微服务名称
-		web.Version(registryConfig.Version),                                        // 微服务版本
-		web.Registry(registryOpt),                                                  // 注册微服务
-		web.RegisterTTL(time.Second * time.Duration(registryConfig.Ttl)),           // 微服务发现组件中的节点存活时间
-		web.RegisterInterval(time.Second * time.Duration(registryConfig.Interval)), // 微服务发现组件中的节点刷新间隔
-		web.Metadata(registryConfig.MetaData),                                      // 微服务自身元数据，会上报给服务发现组件。是一个 key-value 列表
+		web.Name(registryConfig.Name),
+		web.Version(registryConfig.Version),
+		web.Registry(registryOpt),
+		web.RegisterTTL(time.Second * time.Duration(registryConfig.Ttl)),
+		web.RegisterInterval(time.Second * time.Duration(registryConfig.Interval)),
+		web.Metadata(registryConfig.MetaData),
 		web.Flags(&cli.StringFlag{
 			Name:  "env",
 			Value: "dev",

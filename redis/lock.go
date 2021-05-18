@@ -12,7 +12,10 @@ import (
 // LockResourceFunc is function which will be done after lock successfully by redis.
 type LockResourceFunc func(ctx context.Context, args ...interface{}) ([]interface{}, error)
 
+// LockOptions ...
 type LockOptions func(*LockOption)
+
+// LockOption ...
 type LockOption struct {
 	autoExpire                  int
 	maxExpire                   time.Duration
@@ -20,18 +23,13 @@ type LockOption struct {
 	firstrRetryIntervalDuration time.Duration
 }
 
+// newLockOption ...
 func newLockOption() *LockOption {
 	return &LockOption{
 		autoExpire:                  60,
 		maxExpire:                   240 * time.Second,
 		retryTimes:                  10,
 		firstrRetryIntervalDuration: 1 * time.Second,
-	}
-}
-
-func (l *LockOption) applyOpts(opts ...LockOptions) {
-	for _, opt := range opts {
-		opt(l)
 	}
 }
 
@@ -46,7 +44,9 @@ func (l *LockOption) applyOpts(opts ...LockOptions) {
 //		err        error
 func (r *Redis) TryLock(key string, lrfn LockResourceFunc, lrfnIn []interface{}, opts ...LockOptions) (lrfnOut []interface{}, err error) {
 	l := newLockOption()
-	l.applyOpts(opts...)
+	for _, opt := range opts {
+		opt(l)
+	}
 
 	for i := 0; i < l.retryTimes; i++ {
 		reply, err := r.SetNX(key, 1, l.autoExpire)
@@ -80,6 +80,7 @@ func (r *Redis) TryLock(key string, lrfn LockResourceFunc, lrfnIn []interface{},
 	return nil, errors.New("try lock failed")
 }
 
+// SetLockAutoExpire ...
 func SetLockAutoExpire(d time.Duration) LockOptions {
 	return func(l *LockOption) {
 		t := int(d) / int(time.Second)
@@ -90,18 +91,21 @@ func SetLockAutoExpire(d time.Duration) LockOptions {
 	}
 }
 
+// SetMaxExpire ...
 func SetMaxExpire(d time.Duration) LockOptions {
 	return func(l *LockOption) {
 		l.maxExpire = d
 	}
 }
 
+// SetLockRetryTimes ...
 func SetLockRetryTimes(times int) LockOptions {
 	return func(l *LockOption) {
 		l.retryTimes = times
 	}
 }
 
+// SetLockFirstRetryIntervalDuration ...
 func SetLockFirstRetryIntervalDuration(d time.Duration) LockOptions {
 	return func(l *LockOption) {
 		l.firstrRetryIntervalDuration = d

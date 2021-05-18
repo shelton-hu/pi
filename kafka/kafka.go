@@ -25,33 +25,34 @@ const (
 	_KafkaPeerService   = "kafka"
 )
 
+// Handler ...
 type Handler func(ctx context.Context, msg []byte) error
 
+// SubscribeOptions ...
 type SubscribeOptions func(s *SubscribeOption)
 
+// SubscribeOption ...
 type SubscribeOption struct {
 	groupId string
 }
 
+// Publish ...
 func (k *Kafka) Publish(ctx context.Context, topic string, m []byte) (err error) {
 	headers := make(map[string]string)
 	// build msg head by jaeger start
 	name := fmt.Sprintf("%s.%s", _KafkaProducer, topic)
 	_, span, err := microTracing.StartSpanFromContext(ctx, opentracing.GlobalTracer(), name)
 	if err == nil {
-		// 设置kafka特有标签
 		ext.SpanKindProducer.Set(span)
 		ext.Component.Set(span, _KafkaComponent)
 		ext.PeerService.Set(span, _KafkaPeerService)
 		ext.MessageBusDestination.Set(span, topic)
-		// span注入header
 		_ = opentracing.GlobalTracer().Inject(span.Context(), opentracing.TextMap, opentracing.TextMapCarrier(headers))
 		span.LogKV("data", string(m))
 		defer span.Finish()
 	}
-	// 组装message
+
 	msg := &sarama.ProducerMessage{}
-	// kafka从0.11版本开始支持header
 	if k.cfg.Version.IsAtLeast(sarama.V0_11_0_0) {
 		for key, value := range headers {
 			header := sarama.RecordHeader{
@@ -73,6 +74,7 @@ func (k *Kafka) Publish(ctx context.Context, topic string, m []byte) (err error)
 	}
 }
 
+// Subscribe ...
 func (k *Kafka) Subscribe(ctx context.Context, topic string, handler Handler, opts ...SubscribeOptions) error {
 	// apply opts
 	s := newSubscribeOption()
@@ -164,18 +166,21 @@ func (k *Kafka) Subscribe(ctx context.Context, topic string, handler Handler, op
 	}
 }
 
+// newSubscribeOption ...
 func newSubscribeOption() *SubscribeOption {
 	return &SubscribeOption{
 		groupId: _KafkaDefautGroupId,
 	}
 }
 
+// applyOpts ...
 func (s *SubscribeOption) applyOpts(opts ...SubscribeOptions) {
 	for _, opt := range opts {
 		opt(s)
 	}
 }
 
+// SetSubscribeGroupId ...
 func SetSubscribeGroupId(groupId string) SubscribeOptions {
 	return func(s *SubscribeOption) {
 		s.groupId = groupId

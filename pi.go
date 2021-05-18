@@ -105,7 +105,7 @@ func SetGlobal(ctx context.Context, etcdAddresses []string, namespace, appname s
 
 func G() *Pi {
 	if global == nil {
-		panic("pi is not init")
+		panic("github.com/shelton-hu/pi is not init")
 	}
 	return global
 }

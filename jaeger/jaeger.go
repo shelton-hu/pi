@@ -16,15 +16,16 @@ import (
 
 var j *Jaeger
 
+// Jaeger ...
 type Jaeger struct {
 	close io.Closer
 }
 
-// 获取jaeger实例
+// ConnectJaeger connects to jaeger.
 func ConnectJaeger(ctx context.Context, jaegerConfig config.Jaeger, opts ...jaegerConfigure.Option) {
 	address := fmt.Sprintf("%s:%d", jaegerConfig.Host, jaegerConfig.Port)
 
-	// 配置项参考 https://github.com/jaegertracing/jaeger-client-go/blob/master/config/config.go
+	// @wiki https://github.com/jaegertracing/jaeger-client-go/blob/master/config/config.go
 	configure := jaegerConfigure.Configuration{
 		ServiceName: jaegerConfig.Name,
 		Sampler: &jaegerConfigure.SamplerConfig{
@@ -48,6 +49,7 @@ func ConnectJaeger(ctx context.Context, jaegerConfig config.Jaeger, opts ...jaeg
 	}
 }
 
+// CloseJaeger ...
 func CloseJaeger(ctx context.Context) {
 	if err := j.close.Close(); err != nil {
 		logger.Error(ctx, err.Error())

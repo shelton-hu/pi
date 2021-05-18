@@ -15,7 +15,10 @@ const (
 	_SpanGormKey       = "opentracingSpan"
 )
 
-// SetSpanToGorm sets span to gorm settings, returns cloned DB
+// callbacks ...
+type callbacks struct{}
+
+// SetSpanToGorm sets span to gorm settings, returns cloned DB.
 func (m *Mysql) setSpanToGorm(ctx context.Context) {
 	if ctx == nil {
 		return
@@ -27,7 +30,7 @@ func (m *Mysql) setSpanToGorm(ctx context.Context) {
 	m.Set(_ParentSpanGormKey, parentSpan)
 }
 
-// addGormCallbacks adds callbacks for tracing, you should call SetSpanToGorm to make them work
+// addGormCallbacks adds callbacks for tracing, you should call SetSpanToGorm to make them work.
 func addGormCallbacks(db *gorm.DB) {
 	callbacks := newCallbacks()
 	registerCallbacks(db, "create", callbacks)
@@ -36,8 +39,6 @@ func addGormCallbacks(db *gorm.DB) {
 	registerCallbacks(db, "delete", callbacks)
 	registerCallbacks(db, "row_query", callbacks)
 }
-
-type callbacks struct{}
 
 func newCallbacks() *callbacks {
 	return &callbacks{}
@@ -96,7 +97,7 @@ func registerCallbacks(db *gorm.DB, name string, c *callbacks) {
 	beforeName := fmt.Sprintf("tracing:%v_before", name)
 	afterName := fmt.Sprintf("tracing:%v_after", name)
 	gormCallbackName := fmt.Sprintf("gorm:%v", name)
-	// gorm does some magic, if you pass CallbackProcessor here - nothing works
+	// gorm does some magic, if you pass CallbackProcessor here - nothing works.
 	switch name {
 	case "create":
 		db.Callback().Create().Before(gormCallbackName).Register(beforeName, c.beforeCreate)

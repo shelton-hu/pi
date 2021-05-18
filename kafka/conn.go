@@ -14,6 +14,7 @@ import (
 
 var kafka *Kafka
 
+// Kafka ...
 type Kafka struct {
 	addrs []string
 	cfg   *sarama.Config
@@ -25,6 +26,7 @@ type Kafka struct {
 	mu sync.Mutex
 }
 
+// ConnectKafka ...
 func ConnectKafka(ctx context.Context, kafkaConfig config.Kafka) {
 	// kafka.addrs
 	kafka.addrs = kafkaConfig.Addrs
@@ -63,6 +65,7 @@ func ConnectKafka(ctx context.Context, kafkaConfig config.Kafka) {
 	kafka.clcfg.Version = kafka.cfg.Version
 }
 
+// CloseKafka ...
 func CloseKafka(ctx context.Context) {
 	for _, client := range kafka.cs {
 		if err := client.Close(); err != nil {
@@ -76,6 +79,7 @@ func CloseKafka(ctx context.Context) {
 	kafka = nil
 }
 
+// GetConnect returns the kafka instance.
 func GetConnect(ctx context.Context) *Kafka {
 	return kafka
 }

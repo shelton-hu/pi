@@ -86,6 +86,7 @@ func (r *Redis) do(commandName string, args ...interface{}) (reply interface{}, 
 	return reply, err
 }
 
+// parseArgs ...
 func (r *Redis) parseArgs(args ...interface{}) []string {
 	argStrs := make([]string, 0, len(args))
 	for _, arg := range args {
@@ -94,6 +95,7 @@ func (r *Redis) parseArgs(args ...interface{}) []string {
 	return argStrs
 }
 
+// parseArg ...
 func (r *Redis) parseArg(arg interface{}, level int) []string {
 	if arg == nil {
 		return []string{}

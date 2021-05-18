@@ -1,5 +1,6 @@
 package config
 
+// SystemConfig ...
 type SystemConfig struct {
 	Registry   Registry          `json:"registry"`
 	Mysql      map[string]Mysql  `json:"database"`
@@ -11,6 +12,7 @@ type SystemConfig struct {
 	Domain     map[string]string `json:"domain"`
 }
 
+// Registry ...
 type Registry struct {
 	Name     string            `json:"name"`
 	Address  string            `json:"address"`
@@ -20,6 +22,7 @@ type Registry struct {
 	MetaData map[string]string `json:"meta_data"`
 }
 
+// Mysql ...
 type Mysql struct {
 	Dialect        string `json:"dialect"`
 	Database       string `json:"database"`
@@ -32,6 +35,7 @@ type Mysql struct {
 	MaxOpenConnNum int    `json:"max_open_conn_num"`
 }
 
+// Redis ...
 type Redis struct {
 	Host        string `json:"host"`
 	Port        int    `json:"port"`
@@ -42,6 +46,7 @@ type Redis struct {
 	KeyPrefix   string `json:"key_prefix"`
 }
 
+// Jaeger ...
 type Jaeger struct {
 	Host string  `json:"host"`
 	Port int     `json:"port"`
@@ -49,11 +54,13 @@ type Jaeger struct {
 	Rate float64 `json:"rate"`
 }
 
+// Kafka ...
 type Kafka struct {
 	Addrs   []string `json:"addrs"`
 	Version string   `json:"version"`
 }
 
+// DelayQueue ...
 type DelayQueue struct {
 	Host      string `json:"host"`
 	Port      int    `json:"port"`
@@ -61,18 +68,24 @@ type DelayQueue struct {
 	Token     string `json:"token"`
 }
 
+// Cron ...
 type Cron struct {
 	Spec []CronSpec `json:"spec"`
 }
 
+// CronSpec is the spec of the cron.
 type CronSpec struct {
-	// 任务名称，需和注册任务时的名称保持一致
+	// Name of the task，need to be consistent with the name when registering the task.
 	Name string `json:"name"`
-	// 任务排程，暂时不支持`@reboot`
+
+	// Schedule is the schedule of the task，'@reboot' is not currently supported.
 	// @wiki https://en.wikipedia.org/wiki/Cron
 	Schedule string `json:"schedule"`
-	// 任务起停按钮，当为true，代表暂停任务，默认为false
+
+	// Suspend can be used to stop or start the task，when it's true, the task will
+	// or has been stopped. Default value of the suspend is false.
 	Suspend bool `json:"suspend"`
-	// 任务并发数，默认为1
+
+	// Parallelism is the concurrent number of the task.
 	Parallelism int `json:"parallelism"`
 }

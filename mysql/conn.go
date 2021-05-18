@@ -12,12 +12,15 @@ import (
 	"github.com/shelton-hu/pi/config"
 )
 
+// dbPool is the pool is all registry database of mysql.
+var dbPool = make(map[string]*Mysql)
+
+// Mysql ...
 type Mysql struct {
 	*gorm.DB
 }
 
-var dbPool = make(map[string]*Mysql)
-
+// ConnectMysql ...
 func ConnectMysql(ctx context.Context, mysqlConfigs map[string]config.Mysql) {
 	for name, mysqlConfig := range mysqlConfigs {
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&loc=Local", mysqlConfig.User, mysqlConfig.Password, mysqlConfig.Host, mysqlConfig.Port, mysqlConfig.Database, mysqlConfig.Charset)
@@ -42,6 +45,7 @@ func ConnectMysql(ctx context.Context, mysqlConfigs map[string]config.Mysql) {
 	}
 }
 
+// CloseMysql ...
 func CloseMysql(ctx context.Context) {
 	for _, db := range dbPool {
 		if err := db.Close(); err != nil {
@@ -50,6 +54,7 @@ func CloseMysql(ctx context.Context) {
 	}
 }
 
+// GetContect returns the mysql instance.
 func GetConnect(ctx context.Context, name ...string) *Mysql {
 	key := "default"
 	if len(name) > 0 {

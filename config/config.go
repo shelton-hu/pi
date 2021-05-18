@@ -12,31 +12,38 @@ import (
 )
 
 const (
-	// 配置 key = _BaseKeyPath + namespace + appName + (_SysConfPath or _CusConfPath)
-	_BaseKeyPath = "/micro/config/" //etcd基本配置key
-	_SysConfPath = "/sysconf"       //系统配置key
-	_CusConfPath = "/cusconf"       //自定义配置key
+	// etcd config key = _BaseKeyPath + namespace + appName + (_SysConfPath or _CusConfPath)
+	_BaseKeyPath = "/micro/config/"
+	_SysConfPath = "/sysconf"
+	_CusConfPath = "/cusconf"
 )
 
 var (
+	// sysconf is the system config variable.
 	sysconf *SystemConfig
+
+	// cusconf is the custom config variable.
 	cusconf *CustomConfig
 )
 
+// InitConfig initialize the system and custon config.
 func InitConfig(ctx context.Context, etcdAddresses []string, namespace string, appName string) {
-	initConfig(ctx, etcdAddresses, namespace, appName, sysconf, _SysConfPath)
-	initConfig(ctx, etcdAddresses, namespace, appName, cusconf, _CusConfPath)
+	initConfig(ctx, etcdAddresses, namespace, appName, _SysConfPath, sysconf)
+	initConfig(ctx, etcdAddresses, namespace, appName, _CusConfPath, cusconf)
 }
 
+// SysConf returns the system config.
 func SysConf() *SystemConfig {
 	return sysconf
 }
 
+// CusConf returns the custom config.
 func CusConf() *CustomConfig {
 	return cusconf
 }
 
-func initConfig(ctx context.Context, etcdAddresses []string, namespace string, appName string, conf interface{}, etcdConfigPathSuffix string) {
+// initConfig watch the config from etcd.
+func initConfig(ctx context.Context, etcdAddresses []string, namespace string, appName string, etcdConfigPathSuffix string, conf interface{}) {
 	source := etcd.NewSource(
 		etcd.WithAddress(etcdAddresses...),
 		etcd.WithPrefix(_BaseKeyPath+namespace+appName+_CusConfPath),
