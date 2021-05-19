@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"encoding/json"
 	"reflect"
 
 	"github.com/gomodule/redigo/redis"
@@ -9,6 +10,16 @@ import (
 // Set ...
 func (r *Redis) Set(key string, value interface{}, expire int) error {
 	_, err := r.do("Set", key, value, "EX", expire)
+	return err
+}
+
+// SetObject ...
+func (r *Redis) SetObject(key string, v interface{}, expire int) error {
+	obj, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	_, err = r.do("Set", key, obj, "EX", expire)
 	return err
 }
 
@@ -57,7 +68,16 @@ func (r *Redis) Get(key string) (interface{}, error) {
 	return reply, err
 }
 
-// Int
+// GetObject ...
+func (r *Redis) GetObject(key string, obj interface{}) error {
+	reply, err := r.Bytes(key)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(reply, &obj)
+}
+
+// Int ...
 func (r *Redis) Int(key string) (int, error) {
 	reply, err := redis.Int(r.Get(key))
 	if err == redis.ErrNil {
