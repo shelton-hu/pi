@@ -8,13 +8,13 @@ import (
 )
 
 // Set ...
-func (r *Redis) Set(key string, value interface{}, expire int) error {
+func (r *Redis) Set(key string, value interface{}, expire ExpireTime) error {
 	_, err := r.do("Set", key, value, "EX", expire)
 	return err
 }
 
 // SetObject ...
-func (r *Redis) SetObject(key string, v interface{}, expire int) error {
+func (r *Redis) SetObject(key string, v interface{}, expire ExpireTime) error {
 	obj, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -24,13 +24,13 @@ func (r *Redis) SetObject(key string, v interface{}, expire int) error {
 }
 
 // SetNX returns (true, nil) if success, or returns (false, error).
-func (r *Redis) SetNX(key string, value interface{}, expire int) (bool, error) {
+func (r *Redis) SetNX(key string, value interface{}, expire ExpireTime) (bool, error) {
 	reply, err := r.do("Set", key, value, "EX", expire, "NX")
 	return reply != nil, err
 }
 
 // Incr ...
-func (r *Redis) Incr(key string, value interface{}, expire int) (int, error) {
+func (r *Redis) Incr(key string, value interface{}, expire ExpireTime) (int, error) {
 	reply, err := redis.Int(r.do("INCR", key))
 	if err != nil {
 		return 0, err
@@ -54,7 +54,7 @@ func (r *Redis) Decr(key string) (int, error) {
 }
 
 // Expire ...
-func (r *Redis) Expire(key string, expire int) error {
+func (r *Redis) Expire(key string, expire ExpireTime) error {
 	_, err := r.do("EXPIRE", key, expire)
 	return err
 }
@@ -207,7 +207,7 @@ func (r *Redis) Exists(key string) (exists bool, err error) {
 }
 
 // Sadd ...
-func (r *Redis) Sadd(key string, vals interface{}, expire int) (err error) {
+func (r *Redis) Sadd(key string, vals interface{}, expire ExpireTime) (err error) {
 	args := []interface{}{key}
 
 	if reflect.TypeOf(vals).Kind() == reflect.Slice {

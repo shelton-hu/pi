@@ -17,8 +17,8 @@ type LockOptions func(*LockOption)
 
 // LockOption ...
 type LockOption struct {
-	autoExpire                  int
-	maxExpire                   time.Duration
+	autoExpire                  ExpireTime
+	maxExpire                   ExpireTime
 	retryTimes                  int
 	firstrRetryIntervalDuration time.Duration
 }
@@ -27,7 +27,7 @@ type LockOption struct {
 func newLockOption() *LockOption {
 	return &LockOption{
 		autoExpire:                  60,
-		maxExpire:                   240 * time.Second,
+		maxExpire:                   4 * ExpireTImeMinute,
 		retryTimes:                  10,
 		firstrRetryIntervalDuration: 1 * time.Second,
 	}
@@ -57,7 +57,7 @@ func (r *Redis) TryLock(key string, lrfn LockResourceFunc, lrfnIn []interface{},
 
 		done := make(chan struct{}, 1)
 		go func() {
-			timer := time.NewTimer(l.maxExpire)
+			timer := time.NewTimer(time.Duration(l.maxExpire) * time.Second)
 			for i := 0; ; i++ {
 				select {
 				case <-done:
@@ -81,18 +81,14 @@ func (r *Redis) TryLock(key string, lrfn LockResourceFunc, lrfnIn []interface{},
 }
 
 // SetLockAutoExpire ...
-func SetLockAutoExpire(d time.Duration) LockOptions {
+func SetLockAutoExpire(d ExpireTime) LockOptions {
 	return func(l *LockOption) {
-		t := int(d) / int(time.Second)
-		if t < 2 {
-			t = 2
-		}
-		l.autoExpire = t
+		l.autoExpire = d
 	}
 }
 
 // SetMaxExpire ...
-func SetMaxExpire(d time.Duration) LockOptions {
+func SetMaxExpire(d ExpireTime) LockOptions {
 	return func(l *LockOption) {
 		l.maxExpire = d
 	}
