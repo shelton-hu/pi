@@ -15,6 +15,7 @@ import (
 	"github.com/shelton-hu/pi/micro"
 	"github.com/shelton-hu/pi/mysql"
 	"github.com/shelton-hu/pi/redis"
+	"github.com/shelton-hu/pi/websocket"
 )
 
 var global *Pi
@@ -29,6 +30,7 @@ type Pi struct {
 	microWebService web.Service
 	cron            *cron.Cron
 	daemon          *daemon.Daemon
+	wsupgrader      *websocket.Upgrader
 }
 
 type options func(*Option)
@@ -77,6 +79,8 @@ func SetGlobal(ctx context.Context, etcdAddresses []string, namespace, appname s
 		global = &Pi{
 			namespace: namespace,
 			appName:   appname,
+
+			wsupgrader: websocket.NewUpgrader(),
 		}
 
 		config.InitConfig(ctx, etcdAddresses, global.namespace, global.appName)
@@ -152,4 +156,8 @@ func (p *Pi) Cron() *cron.Cron {
 
 func (p *Pi) Daemon() *daemon.Daemon {
 	return p.daemon
+}
+
+func (p *Pi) WsUpgrader() *websocket.Upgrader {
+	return p.wsupgrader
 }
