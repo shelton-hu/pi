@@ -11,6 +11,7 @@ go.sum
 .prettierrc
 # deploy file
 .env
+.dev-data
 # folder
 /vendor
 /tmp

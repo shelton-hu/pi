@@ -1,6 +1,7 @@
 #! /bin/bash
 
 cd $(dirname $0)
+dir=$(pwd)
 
 export $(cat .env)
 

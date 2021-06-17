@@ -1,18 +1,25 @@
 default: up
 
 .PHONY: up
-up:
+up: check
 	sh ./env.sh
-	sh ./before-up.sh
+	sh ./before-start.sh
 	docker-compose up -d
-	sh ./after-up.sh
+	sh ./after-start.sh
 
 .PHONY: down
-down:
-	sh ./env.sh
+down: check
 	docker-compose down
 
-.PHONY: clean
-clean:
-	sh ./env.sh
-	sh ./clean.sh
+.PHONY: restart
+restart: check
+	make down
+	make up
+
+.PHONY: put-config
+put-config: check
+	sh ./after-start.sh
+
+.PHONY: check
+check:
+	sh ./check.sh

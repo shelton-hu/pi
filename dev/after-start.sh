@@ -2,6 +2,8 @@
 
 cd $(dirname $0)
 
+export $(cat .env)
+
 # 等待kafka-manager起来
 success_code="200"
 http_status_code=`curl -I -m 10 -o /dev/null -s -w %{http_code} http://127.0.0.1:9000`
